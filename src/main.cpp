@@ -1,4 +1,5 @@
 #include "tensor.h"
+#include "ops.h"
 #include <iostream>
 using namespace std;
 
@@ -24,41 +25,78 @@ void test_tensor() {
 void test_inner() {
     Tensor<int> one({5});
     one.rand();
-    cout << "primo vettore: ";
-    //one.print();
-    for (int i=0; i<5; i++) 
-        cout << one({i}) << ", ";
-    cout << endl;
+    one.print();
     Tensor<int> second({5});
     second.rand();
-    cout << "secondo vettore: ";
-    //second.print();
-    for (int i=0; i<5; i++)
-        cout << second({i}) << ", ";
-    cout << endl;
+    second.print();
     Tensor<int> product = one.dot(second);
-    //cout << "risultato: ";
-    //product.print();
-    for (int i=0; i<product.size(); i++) {
-        cout << product({i}) << endl;
-    }
-    cout << "\n\n";
-    one.print();
+    product.print();
 }
 
 void test_matmul() {
-    Tensor<int> a({2, 3});
+    #define N 100
+    Tensor<int> a({N, N});
+    a.rand();
+    //a.print();
+    Tensor<int> b({N, N});
+    b.rand();
+    //b.print();
+    Tensor<int> c({N, N});
+    c = a.dot(b);
+    //c.print();
+}
+
+void test_transpose() {
+    Tensor<int> a({5});
     a.rand();
     a.print();
-    Tensor<int> b({3, 2});
-    b.rand();
+    Tensor<int>b({5});
+    b = a.transpose();
     b.print();
-    Tensor<int> c({2, 2});
-    c = a.dot(b);
-    c.print();
+    cout << endl;
+    Tensor<int> A({3, 2});
+    A.rand();
+    A.print();
+    Tensor<int> B({2, 3});
+    B = A.transpose();
+    B.print();
+}
+
+void test() {
+    Tensor<int> A({5, 5});
+    Tensor<int> B({5, 5});
+    A.rand();
+    B.rand();
+    A.reshape({25, 5});
+    B.reshape({5, 25});
+    Tensor<int> C({25, 25});
+    C = A.dot(B);
+    C.print();
+}
+
+void test_ops() {
+    Tensor<float> A({5, 5});
+    Tensor<float> B({5, 5});
+    Tensor<float> C({5, 5});
+    A.rand();
+    B.rand();
+    A.print();
+    B.print();
+    matmul(A, B, &C);
+    C.print();
+}
+
+void test_print() {
+    Tensor<int> A({2, 3, 4});
+    Tensor<int> B({5});
+    Tensor<int> C({4, 4});
+    A.rand(); B.rand(); C.rand();
+    B.print();
+    C.print();
+    A.print();
 }
 
 int main() {
     srand(time(0));
-    test_matmul();
+    test_print();
 }

@@ -45,6 +45,11 @@ const T& Tensor<T>::operator()(const std::vector<int>& index) const {
 }
 
 template<class T>
+T& Tensor<T>::operator[](int index) {
+    return data[index];
+}
+
+template<class T>
 void Tensor<T>::operator*(const T scalar) {
     for (int i=0; i<data.size(); i++) {
         data[i] *= scalar;
@@ -84,6 +89,24 @@ void Tensor<T>::reshape(std::vector<int> new_shape) {
     shape = new_shape;
 }
 
+template<class T>
+Tensor<T> Tensor<T>::transpose() {
+    if (shape.size()==1) {
+        return *this;
+    }
+    if (shape.size()==2) {
+        Tensor<T>output({shape[1], shape[0]});
+
+        for (int row=0; row<shape[0]; row++) {
+            for (int col=0; col<shape[1]; col++) {
+                output.data[(col*shape[0])+row] = data[row*shape[1]+col];
+            }
+        }
+        return output;
+    }
+    assert(1==0);
+}
+
 template<>
 void Tensor<float>::rand() {
     for (int i=0; i<data.size(); i++) 
@@ -110,25 +133,56 @@ int Tensor<T>::rank() {
 
 template<class T>
 void Tensor<T>::print() {
-    if (shape.size()==1) {
-        std::cout << "Vector [";
-        for (T i: data)
-            std::cout << i << ", ";
-        std::cout << "]" << std::endl;
+    if (shape.empty()) {
+        std::cout << "[]";
         return;
     }
-    if (shape.size()==2) {
-        std::cout << "Matrix [" << std::endl;
-        for (int i=0; i<shape[0]; i++) {
-            std::cout << "[";
-            for (int j=0; j<shape[1]; j++) {
-                std::cout << (*this)({i, j}) << ", ";
+    std::cout << "Tensor ";
+    printRecursive(data, shape, 0, std::vector<int>(shape.size()), 0);
+    std::cout << std::endl;
+}
+
+template<class T>
+void Tensor<T>::printRecursive(const std::vector<T>& data, const std::vector<int>& shape, int depth, std::vector<int> indices, int indent) {
+    for (int i = 0; i < indent; i++) {
+        std::cout << "  ";
+    }
+
+    if (depth == shape.size() - 1) {
+        std::cout << "[";
+
+        for (int i = 0; i < shape[depth]; i++) {
+            indices[depth] = i;
+            std::cout << (*this)(indices);
+
+            if (i < shape[depth] - 1) {
+                std::cout << ", ";
             }
-            std::cout << "]" << std::endl;
         }
-        std::cout << "]" << std::endl; 
+
+        std::cout << "]";
+    } else {
+        std::cout << "[" << std::endl;
+
+        for (int i = 0; i < shape[depth]; i++) {
+            indices[depth] = i;
+            printRecursive(data, shape, depth + 1, indices, indent + 1);
+
+            if (i < shape[depth] - 1) {
+                std::cout << ",";
+            }
+
+            std::cout << std::endl;
+        }
+
+        for (int i = 0; i < indent; i++) {
+            std::cout << "  ";
+        }
+
+        std::cout << "]";
     }
 }
+
 
 template class Tensor<int>;
 template class Tensor<float>;
