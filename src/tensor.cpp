@@ -107,6 +107,46 @@ Tensor<T> Tensor<T>::transpose() {
     assert(1==0);
 }
 
+template<class T>
+void Tensor<T>::load(const std::vector<T>& extern_data) {
+    data = extern_data;
+}
+
+template<class T>
+Tensor<T> Tensor<T>::flatten() {
+    Tensor<T>output({(*this).size()});
+    output.load(data);
+    return output;
+}
+
+template<class T>
+void Tensor<T>::reduce() {
+    assert(shape.size()==2);
+    for (int i=0; i<shape[0]; i++) {
+        T pivot = data[i*shape[0]];
+        int index = 0;
+        if (pivot==0) {
+            bool found = 0;
+            for (int k=0; k<shape[1]; k++) {
+                if (data[i*shape[0]+k]!=0 && !found) {
+                    found = 1;
+                    pivot = data[i*shape[0]+k];
+                    index = k;
+                }
+            }
+            if (!found) {
+                //swap rows;
+            }
+        }
+        for (int j=i+1; j<shape[0]; j++) {
+            T coeff = data[j*shape[0]+index] / pivot;
+            for (int k=0; k<shape[1]; k++) {
+                data[j*shape[0]+k] -= coeff * data[i*shape[0]+k];
+            }
+        }
+    }
+}
+
 template<>
 void Tensor<float>::rand() {
     for (int i=0; i<data.size(); i++) 
@@ -133,13 +173,13 @@ int Tensor<T>::rank() {
 
 template<class T>
 void Tensor<T>::print() {
+    std::cout << "Tensor(";
     if (shape.empty()) {
-        std::cout << "[]";
+        std::cout << "[])" << std::endl;
         return;
-    }
-    std::cout << "Tensor ";
+    }  
     printRecursive(data, shape, 0, std::vector<int>(shape.size()), 0);
-    std::cout << std::endl;
+    std::cout << ")" << std::endl;
 }
 
 template<class T>

@@ -94,9 +94,42 @@ void test_print() {
     B.print();
     C.print();
     A.print();
+
+    Tensor<int> D({});
+    D.print();
+    cout << "\n\n";
+    Tensor<int> E({2, 2, 2, 2, 2});
+    E.rand();
+    E.print();
+}
+
+void test_flatten() {
+    Tensor<int> A({2, 4});
+    A.rand();
+    A.print();
+    Tensor<int> B = A.flatten();
+    B.print();
+}
+
+void test_transposereshape() {
+    Tensor<int> A({2, 3, 4});
+    A.rand();
+    A.print();
+    A.reshape({4, 3, 2});
+    A.print();
+}
+
+void test_reduce() {
+    Tensor<float> A({3, 3});
+    A.rand();
+    A*10;
+    A.print();
+    A * 0.1;
+    A.reduce();
+    A.print();
 }
 
 int main() {
     srand(time(0));
-    test_print();
+    test_reduce();
 }

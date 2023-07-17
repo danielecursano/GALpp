@@ -24,6 +24,9 @@ class Tensor {
         Tensor<T> dot(const Tensor<T> &other);
         void reshape(std::vector<int> new_shape);
         Tensor<T> transpose();
+        void load(const std::vector<T>& extern_data);
+        Tensor<T> flatten();
+        void reduce();
         void rand();
         int size();
         int rank();
