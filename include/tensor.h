@@ -18,8 +18,9 @@ class Tensor {
     public:
 
         std::vector<int> shape;
-        
         Tensor(std::vector<int> shape);
+        static Tensor<T> eye(int dim);
+        static Tensor<T> random(std::vector<int> shape);
         T& operator()(const std::vector<int>& index);
         const T& operator()(const std::vector<int>& index) const;
         T& operator[](int index);

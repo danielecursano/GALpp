@@ -143,13 +143,24 @@ void test_trace() {
 
 void test_det() {
     Tensor<float> A({4, 4});
-    A.load({1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, 1});
+    A.load({1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1});
     cout << A.det() << endl;
     A.reduce();
     A.print();
+    cout << A.size() << endl;
+    A.flatten().print();
+    A.reshape({2, 2, 4});
+    A.print();
+}
+
+void test_constructors() {
+    Tensor<float> A = Tensor<float>::eye(3);
+    A.print();
+    Tensor<int> B = Tensor<int>::random({3, 3});
+    B.print();
 }
 
 int main() {
     srand(time(0));
-    test_det();
+    test_constructors();
 }

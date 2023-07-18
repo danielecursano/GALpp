@@ -16,6 +16,21 @@ Tensor<T>::Tensor(std::vector<int>shape) : shape(shape) {
 }
 
 template<class T>
+Tensor<T> Tensor<T>::eye(int dim) {
+    Tensor<T> output({dim, dim});
+    for (int i=0; i<dim; i++) 
+        output({i, i}) = 1;
+    return output;
+}
+
+template<class T>
+Tensor<T> Tensor<T>::random(std::vector<int>shape) {
+    Tensor<T> output(shape);
+    output.rand();
+    return output;
+}
+
+template<class T>
 bool Tensor<T>::check_index(const std::vector<int>& index) const{
     for (int i=0; i<shape.size(); i++) {
         if (index[i] >= shape[i]) 
@@ -111,6 +126,7 @@ Tensor<T> Tensor<T>::transpose() {
 
 template<class T>
 void Tensor<T>::load(const std::vector<T>& extern_data) {
+    assert(data.size()==extern_data.size());
     data = extern_data;
 }
 
