@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
+#include "math.h"
 
 template<class T>
 Tensor<T>::Tensor(std::vector<int>shape) : shape(shape) {
@@ -11,6 +12,7 @@ Tensor<T>::Tensor(std::vector<int>shape) : shape(shape) {
         size *= s;
     }   
     data.resize(size);
+    rows_swapped = 0;
 }
 
 template<class T>
@@ -120,31 +122,79 @@ Tensor<T> Tensor<T>::flatten() {
 }
 
 template<class T>
+void Tensor<T>::swapRows(int row1, int row2) {
+    assert(shape.size()==2 && row1 < shape[0] && row2 < shape[1]);
+    if (row1==row2) 
+        return ;
+    rows_swapped++;
+    for (int i=0; i<shape[1]; i++) {
+        const T tmp = data[row1*shape[0]+i];
+        data[row1*shape[0]+i] = data[row2*shape[0]+i];
+        data[row2*shape[0]+i] = tmp;
+    }
+}
+
+template<class T>
+int Tensor<T>::findPivot(int row) {
+    assert(shape.size() == 2 && row < shape[0]);
+    int index = 0;
+    while (index < shape[1] && data[row * shape[1] + index] == 0) {
+        index++;
+    }
+    if (index >= shape[1] || data[row * shape[1] + index] == 0) {
+        index = -1;
+    }
+    return index;
+}
+
+template<class T>
 void Tensor<T>::reduce() {
-    assert(shape.size()==2);
-    for (int i=0; i<shape[0]; i++) {
-        T pivot = data[i*shape[0]];
-        int index = 0;
-        if (pivot==0) {
-            bool found = 0;
-            for (int k=0; k<shape[1]; k++) {
-                if (data[i*shape[0]+k]!=0 && !found) {
-                    found = 1;
-                    pivot = data[i*shape[0]+k];
-                    index = k;
+    assert(shape.size() == 2);
+    rows_swapped = 0;
+    for (int i = 0; i < shape[0]; i++) {
+        T pivot = data[i * shape[1] + i];
+        int index = i;
+        if (pivot == 0) {
+            index = findPivot(i);
+            int row = i;
+            for (int j = i + 1; j < shape[0]; j++) {
+                if (findPivot(j) != -1 && findPivot(j) < index) {
+                    row = j;
+                    index = findPivot(j);
                 }
             }
-            if (!found) {
-                //swap rows;
-            }
+            swapRows(i, row);
+            pivot = data[i * shape[1] + i];
         }
-        for (int j=i+1; j<shape[0]; j++) {
-            T coeff = data[j*shape[0]+index] / pivot;
-            for (int k=0; k<shape[1]; k++) {
-                data[j*shape[0]+k] -= coeff * data[i*shape[0]+k];
+        for (int j = i + 1; j < shape[0]; j++) {
+            T coeff = data[j * shape[1] + index] / pivot;
+            for (int k = 0; k < shape[1]; k++) {
+                data[j * shape[1] + k] -= coeff * data[i * shape[1] + k];
             }
         }
     }
+}
+
+template<class T>
+T Tensor<T>::det() {
+    assert(shape.size()==2 && shape[0]==shape[1]);
+    Tensor<T> copy = (*this);
+    copy.reduce();
+    T det = pow(-1, rows_swapped);
+    for (int i=0; i<shape[0]; i++) {
+        det *= copy({i, i});
+    }
+    return det;
+}
+
+template<class T>
+T Tensor<T>::trace() {
+    assert(shape.size()==2);
+    int lower_dim = shape[0] >= shape[1] ? shape[1] : shape[0];
+    T trace = 0;
+    for (int i=0; i<lower_dim; i++) 
+        trace += (*this)({i, i});
+    return trace;
 }
 
 template<>

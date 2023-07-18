@@ -124,12 +124,32 @@ void test_reduce() {
     A.rand();
     A*10;
     A.print();
-    A * 0.1;
+    //A * 0.1;
+    A.reduce();
+    A.print();
+    cout << A.det() << endl;
+}
+
+void test_trace() {
+    Tensor<int> A({3, 3});
+    A.rand();
+    A.print();
+    cout << A.trace() << endl;
+    Tensor<int> B({2, 3});
+    B.rand();
+    B.print();
+    cout << B.trace() << endl;
+}
+
+void test_det() {
+    Tensor<float> A({4, 4});
+    A.load({1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1, 1});
+    cout << A.det() << endl;
     A.reduce();
     A.print();
 }
 
 int main() {
     srand(time(0));
-    test_reduce();
+    test_det();
 }
