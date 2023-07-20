@@ -6,7 +6,7 @@
 #include "math.h"
 
 template<class T>
-Tensor<T>::Tensor(std::vector<int>shape) : shape(shape) {
+Tensor<T>::Tensor(std::vector<int>shape) : shape_(shape) {
     int size = 1;
     for (int s: shape) {
         size *= s;
@@ -32,8 +32,8 @@ Tensor<T> Tensor<T>::random(std::vector<int>shape) {
 
 template<class T>
 bool Tensor<T>::check_index(const std::vector<int>& index) const{
-    for (int i=0; i<shape.size(); i++) {
-        if (index[i] >= shape[i]) 
+    for (int i=0; i<shape_.size(); i++) {
+        if (index[i] >= shape_[i]) 
             return false;
     } 
     return true;
@@ -46,7 +46,7 @@ int Tensor<T>::calculate_index(const std::vector<int>& index) const {
     int dims = 1;
     for (int i = index.size() - 1; i >= 0; --i) {
         output += index[i] * dims;
-        dims *= shape[i];
+        dims *= shape_[i];
     }
     return output;
 }
@@ -75,7 +75,7 @@ void Tensor<T>::operator*(const T scalar) {
 
 template<class T>
 Tensor<T> Tensor<T>::dot(const Tensor<T> &other) {
-    if ((*this).rank() == 1 && other.shape.size()==1 && data.size()==other.data.size()) {
+    if ((*this).dims() == 1 && other.shape_.size()==1 && data.size()==other.data.size()) {
         Tensor<T>output({1});
         T out_data = 0;
         for (int i=0; i<data.size(); i++) {
@@ -85,11 +85,11 @@ Tensor<T> Tensor<T>::dot(const Tensor<T> &other) {
         return output; 
     }
 
-    if ((*this).rank() == 2 && other.shape.size()==2 && shape[1]==other.shape[0]) {
-        Tensor<T>output({shape[0], other.shape[1]});
-        for (int i=0; i<shape[0]; i++) 
-            for (int j=0; j<other.shape[1]; j++) 
-                for (int k=0; k<shape[1]; k++)
+    if ((*this).dims() == 2 && other.shape_.size()==2 && shape_[1]==other.shape_[0]) {
+        Tensor<T>output({shape_[0], other.shape_[1]});
+        for (int i=0; i<shape_[0]; i++) 
+            for (int j=0; j<other.shape_[1]; j++) 
+                for (int k=0; k<shape_[1]; k++)
                     output({i, j}) += (*this)({i, k}) * other({k, j});
         return output;
     }
@@ -97,26 +97,26 @@ Tensor<T> Tensor<T>::dot(const Tensor<T> &other) {
 }
 
 template<class T>
-void Tensor<T>::reshape(std::vector<int> new_shape) {
+void Tensor<T>::reshape(std::vector<int> new_shape_) {
     int new_size = 1;
-    for (int s: new_shape) {
+    for (int s: new_shape_) {
         new_size *= s;
     }
     assert(new_size==this->size());
-    shape = new_shape;
+    shape_ = new_shape_;
 }
 
 template<class T>
 Tensor<T> Tensor<T>::transpose() {
-    if (shape.size()==1) {
+    if (shape_.size()==1) {
         return *this;
     }
-    if (shape.size()==2) {
-        Tensor<T>output({shape[1], shape[0]});
+    if (shape_.size()==2) {
+        Tensor<T>output({shape_[1], shape_[0]});
 
-        for (int row=0; row<shape[0]; row++) {
-            for (int col=0; col<shape[1]; col++) {
-                output.data[(col*shape[0])+row] = data[row*shape[1]+col];
+        for (int row=0; row<shape_[0]; row++) {
+            for (int col=0; col<shape_[1]; col++) {
+                output.data[(col*shape_[0])+row] = data[row*shape_[1]+col];
             }
         }
         return output;
@@ -139,25 +139,25 @@ Tensor<T> Tensor<T>::flatten() {
 
 template<class T>
 void Tensor<T>::swapRows(int row1, int row2) {
-    assert(shape.size()==2 && row1 < shape[0] && row2 < shape[1]);
+    assert(shape_.size()==2 && row1 < shape_[0] && row2 < shape_[1]);
     if (row1==row2) 
         return ;
     rows_swapped++;
-    for (int i=0; i<shape[1]; i++) {
-        const T tmp = data[row1*shape[0]+i];
-        data[row1*shape[0]+i] = data[row2*shape[0]+i];
-        data[row2*shape[0]+i] = tmp;
+    for (int i=0; i<shape_[1]; i++) {
+        const T tmp = data[row1*shape_[0]+i];
+        data[row1*shape_[0]+i] = data[row2*shape_[0]+i];
+        data[row2*shape_[0]+i] = tmp;
     }
 }
 
 template<class T>
 int Tensor<T>::findPivot(int row) {
-    assert(shape.size() == 2 && row < shape[0]);
+    assert(shape_.size() == 2 && row < shape_[0]);
     int index = 0;
-    while (index < shape[1] && data[row * shape[1] + index] == 0) {
+    while (index < shape_[1] && data[row * shape_[1] + index] == 0) {
         index++;
     }
-    if (index >= shape[1] || data[row * shape[1] + index] == 0) {
+    if (index >= shape_[1] || data[row * shape_[1] + index] == 0) {
         index = -1;
     }
     return index;
@@ -165,27 +165,27 @@ int Tensor<T>::findPivot(int row) {
 
 template<class T>
 void Tensor<T>::reduce() {
-    assert(shape.size() == 2);
+    assert(shape_.size() == 2);
     rows_swapped = 0;
-    for (int i = 0; i < shape[0]; i++) {
-        T pivot = data[i * shape[1] + i];
+    for (int i = 0; i < shape_[0]; i++) {
+        T pivot = data[i * shape_[1] + i];
         int index = i;
         if (pivot == 0) {
             index = findPivot(i);
             int row = i;
-            for (int j = i + 1; j < shape[0]; j++) {
+            for (int j = i + 1; j < shape_[0]; j++) {
                 if (findPivot(j) != -1 && findPivot(j) < index) {
                     row = j;
                     index = findPivot(j);
                 }
             }
             swapRows(i, row);
-            pivot = data[i * shape[1] + i];
+            pivot = data[i * shape_[1] + i];
         }
-        for (int j = i + 1; j < shape[0]; j++) {
-            T coeff = data[j * shape[1] + index] / pivot;
-            for (int k = 0; k < shape[1]; k++) {
-                data[j * shape[1] + k] -= coeff * data[i * shape[1] + k];
+        for (int j = i + 1; j < shape_[0]; j++) {
+            T coeff = data[j * shape_[1] + index] / pivot;
+            for (int k = 0; k < shape_[1]; k++) {
+                data[j * shape_[1] + k] -= coeff * data[i * shape_[1] + k];
             }
         }
     }
@@ -193,11 +193,11 @@ void Tensor<T>::reduce() {
 
 template<class T>
 T Tensor<T>::det() {
-    assert(shape.size()==2 && shape[0]==shape[1]);
+    assert(shape_.size()==2 && shape_[0]==shape_[1]);
     Tensor<T> copy = (*this);
     copy.reduce();
     T det = pow(-1, rows_swapped);
-    for (int i=0; i<shape[0]; i++) {
+    for (int i=0; i<shape_[0]; i++) {
         det *= copy({i, i});
     }
     return det;
@@ -205,8 +205,8 @@ T Tensor<T>::det() {
 
 template<class T>
 T Tensor<T>::trace() {
-    assert(shape.size()==2);
-    int lower_dim = shape[0] >= shape[1] ? shape[1] : shape[0];
+    assert(shape_.size()==2);
+    int lower_dim = shape_[0] >= shape_[1] ? shape_[1] : shape_[0];
     T trace = 0;
     for (int i=0; i<lower_dim; i++) 
         trace += (*this)({i, i});
@@ -233,35 +233,40 @@ int Tensor<T>::size() {
 }
 
 template<class T>
-int Tensor<T>::rank() {
-    return shape.size();
+int Tensor<T>::dims() {
+    return shape_.size();
+}
+
+template<class T>
+std::vector<int> Tensor<T>::shape() {
+    return shape_;
 }
 
 template<class T>
 void Tensor<T>::print() {
     std::cout << "Tensor(";
-    if (shape.empty()) {
+    if (shape_.empty()) {
         std::cout << "[])" << std::endl;
         return;
     }  
-    printRecursive(data, shape, 0, std::vector<int>(shape.size()), 0);
+    printRecursive(data, shape_, 0, std::vector<int>(shape_.size()), 0);
     std::cout << ")" << std::endl;
 }
 
 template<class T>
-void Tensor<T>::printRecursive(const std::vector<T>& data, const std::vector<int>& shape, int depth, std::vector<int> indices, int indent) {
+void Tensor<T>::printRecursive(const std::vector<T>& data, const std::vector<int>& shape_, int depth, std::vector<int> indices, int indent) {
     for (int i = 0; i < indent; i++) {
         std::cout << "  ";
     }
 
-    if (depth == shape.size() - 1) {
+    if (depth == shape_.size() - 1) {
         std::cout << "[";
 
-        for (int i = 0; i < shape[depth]; i++) {
+        for (int i = 0; i < shape_[depth]; i++) {
             indices[depth] = i;
             std::cout << (*this)(indices);
 
-            if (i < shape[depth] - 1) {
+            if (i < shape_[depth] - 1) {
                 std::cout << ", ";
             }
         }
@@ -270,11 +275,11 @@ void Tensor<T>::printRecursive(const std::vector<T>& data, const std::vector<int
     } else {
         std::cout << "[" << std::endl;
 
-        for (int i = 0; i < shape[depth]; i++) {
+        for (int i = 0; i < shape_[depth]; i++) {
             indices[depth] = i;
-            printRecursive(data, shape, depth + 1, indices, indent + 1);
+            printRecursive(data, shape_, depth + 1, indices, indent + 1);
 
-            if (i < shape[depth] - 1) {
+            if (i < shape_[depth] - 1) {
                 std::cout << ",";
             }
 
@@ -288,7 +293,6 @@ void Tensor<T>::printRecursive(const std::vector<T>& data, const std::vector<int
         std::cout << "]";
     }
 }
-
 
 template class Tensor<int>;
 template class Tensor<float>;

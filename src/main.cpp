@@ -1,7 +1,10 @@
 #include "tensor.h"
 #include "ops.h"
+#include "timer.h"
 #include <iostream>
 using namespace std;
+#define N 4
+#define R 2
 
 void test_tensor() {
     Tensor<float> T({5, 1, 1});
@@ -9,7 +12,7 @@ void test_tensor() {
     T.reshape({1, 1, 5});
     T.rand();
     cout << T({0, 0, 1}) << endl;
-    cout << T.rank() << endl;
+    cout << T.dims() << endl;
     T*2.0;
     cout << T({0, 0, 1}) << endl;
     //T.print();  
@@ -34,7 +37,6 @@ void test_inner() {
 }
 
 void test_matmul() {
-    #define N 100
     Tensor<int> a({N, N});
     a.rand();
     //a.print();
@@ -148,19 +150,41 @@ void test_det() {
     A.reduce();
     A.print();
     cout << A.size() << endl;
-    A.flatten().print();
-    A.reshape({2, 2, 4});
-    A.print();
 }
 
 void test_constructors() {
     Tensor<float> A = Tensor<float>::eye(3);
     A.print();
-    Tensor<int> B = Tensor<int>::random({3, 3});
+    Tensor<float> B = Tensor<float>::random({3, 3});
     B.print();
+    Tensor<float> C = B.dot(A);
+    C.print();
+}
+
+void test_swaps() {
+    double start, end;
+    Tensor<float> A = Tensor<float>::random({N, N});
+    //A.print();
+    start = get_time();
+    //A.swapRows(0, R);
+    end = get_time();
+    //A.print();
+    //A.swapRows(0, R);
+    cout << "EXEC TIME: " << end-start << endl;
+
+    Tensor<float> E = Tensor<float>::eye(N);
+    start = get_time();
+    E({0, 0}) = 0;
+    E({0, R}) = 1;
+    E({R, R}) = 0;
+    E({R, 0}) = 1;
+    //E.print();
+    Tensor<float> C = E.dot(A);
+    end = get_time();
+    cout << "EXEC TIME: " << end-start << endl;
 }
 
 int main() {
     srand(time(0));
-    test_constructors();
+    test_swaps();
 }

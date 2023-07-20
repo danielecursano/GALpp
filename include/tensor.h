@@ -8,16 +8,15 @@ class Tensor {
 
     std::vector<T> data;
     int rows_swapped;
-
+    std::vector<int> shape_;
     int calculate_index(const std::vector<int>& index) const;
     bool check_index(const std::vector<int>& index) const;
     void printRecursive(const std::vector<T>& data, const std::vector<int>& shape, int depth, std::vector<int> indices, int indent);
-    void swapRows(int row1, int row2);
     int findPivot(int row);
-
+    void swapRows(int row1, int row2);
+    
     public:
 
-        std::vector<int> shape;
         Tensor(std::vector<int> shape);
         static Tensor<T> eye(int dim);
         static Tensor<T> random(std::vector<int> shape);
@@ -35,8 +34,10 @@ class Tensor {
         T trace();
         void rand();
         int size();
-        int rank();
+        int dims();
+        std::vector<int> shape();
         void print();
+
 };
 
 #endif
