@@ -25,6 +25,7 @@ class Tensor {
         T& operator[](int index);
         void operator*(T scalar);
         Tensor<T> dot(const Tensor<T> &other);
+        Tensor<T> outer(Tensor<T> other);
         void reshape(std::vector<int> new_shape);
         Tensor<T> transpose();
         void load(const std::vector<T>& extern_data);

@@ -97,6 +97,16 @@ Tensor<T> Tensor<T>::dot(const Tensor<T> &other) {
 }
 
 template<class T>
+Tensor<T> Tensor<T>::outer(Tensor<T> other) {
+    assert((*this).dims()==1 && other.shape_.size()==1 && data.size()==other.data.size());
+    reshape({shape_[0], 1});
+    Tensor<T> a = (*this);
+    Tensor<T> b = other;
+    a.reshape({shape_[0], 1}); b.reshape({1, shape_[0]});
+    return a.dot(b);
+}
+
+template<class T>
 void Tensor<T>::reshape(std::vector<int> new_shape_) {
     int new_size = 1;
     for (int s: new_shape_) {

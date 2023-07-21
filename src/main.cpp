@@ -3,8 +3,8 @@
 #include "timer.h"
 #include <iostream>
 using namespace std;
-#define N 4
-#define R 2
+#define N 2048
+#define R 1
 
 void test_tensor() {
     Tensor<float> T({5, 1, 1});
@@ -184,7 +184,41 @@ void test_swaps() {
     cout << "EXEC TIME: " << end-start << endl;
 }
 
+void test_swappp() {
+    double start, end;
+	Tensor<int> A = Tensor<int>::random({N, 1});
+	Tensor<int> B = Tensor<int>::eye(N);
+    //A.print();
+    start = get_time();
+    B({0, 0}) = 0;
+    B({0, R}) = 1;
+    B({R, R}) = 0;
+    B({R, 0}) = 1;
+    A = B.dot(A);
+    end = get_time();
+    cout << "EXEC TIME: " << end-start << endl;
+    //A.print();
+    start = get_time();
+    int tmp = A({0, 0});
+    A({0, 0}) = A({R, 0});
+    A({R, 0}) = tmp;
+    end = get_time();
+    cout << "EXEC TIME: " << end-start << endl;
+    //A.print();
+}
+
+void test_outer() {
+    Tensor<int> A = Tensor<int>::random({5, 1});
+    Tensor<int> B = Tensor<int>::random({5, 1});
+    B = B.transpose();
+    //A.print(); B.print();
+    A.dot(B).print(); 
+    B = B.transpose();
+    A.reshape({5}); B.reshape({5});
+    A.outer(B).print();
+}
+
 int main() {
     srand(time(0));
-    test_swaps();
+    test_outer();
 }
