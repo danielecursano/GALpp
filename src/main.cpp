@@ -208,17 +208,48 @@ void test_swappp() {
 }
 
 void test_outer() {
-    Tensor<int> A = Tensor<int>::random({5, 1});
-    Tensor<int> B = Tensor<int>::random({5, 1});
-    B = B.transpose();
-    //A.print(); B.print();
-    A.dot(B).print(); 
-    B = B.transpose();
-    A.reshape({5}); B.reshape({5});
-    A.outer(B).print();
+    Tensor<float> A({3});
+    Tensor<float> B({3});
+    //B = B.transpose();
+    A.load({0, 9, 4}); B.load({4,0,2});
+    //A.dot(B).print(); 
+    //B = B.transpose();
+    //A.reshape({5}); B.reshape({5});
+    A.outer(B).transpose().print();
+}
+
+void test_inv() {
+    Tensor<float> A({3, 3});
+    A.load({1, 1, -1, 1, -1, 1, -1, 1, 1});
+    A.inv().print();
+
+    A.rand();
+    A.print();
+    A.inv().print();
+
+}
+
+void test_solve() {
+    Tensor<float> A({3, 3});
+    A.load({1, 2, -2, 2, 1, -1, 2, -1, 2});
+    Tensor<float> B({3, 1});
+    B.load({-1, 1, 6});
+    cout << A.det() << endl;
+    A.print();
+    A = A.inv();
+    A.print();
+    A.dot(B).print();
+
+    cout << "random test" << endl;
+    A.rand();
+    B.rand();
+    A.print(); B.print();
+    A = A.inv();
+    A.dot(B).print();
+
 }
 
 int main() {
     srand(time(0));
-    test_outer();
+    test_solve();
 }

@@ -148,6 +148,32 @@ Tensor<T> Tensor<T>::flatten() {
 }
 
 template<class T>
+Tensor<T> Tensor<T>::inv() {
+    assert(shape_.size()==2 && det()!=0);
+    Tensor<T> C(shape_);
+    for (int i=0; i<shape_[0]; i++) {
+        for (int j=0; j<shape_[1]; j++) {
+            T cofactor = pow(-1, i+j);
+            Tensor<T> tmp({shape_[0]-1, shape_[1]-1});
+            std::vector<T>tmp_data;
+            for (int row=0; row<shape_[0]; row++) {
+                for (int col=0; col<shape_[0]; col++) {
+                    if (row!=i && col!=j) {
+                        tmp_data.push_back((*this)({row, col}));
+                    }
+                }
+            }
+            tmp.load(tmp_data);
+            cofactor *= tmp.det();
+            C({i, j}) = cofactor;
+        }
+    }
+    C = C.transpose();
+    C * (1/det());
+    return C;
+}
+
+template<class T>
 void Tensor<T>::swapRows(int row1, int row2) {
     assert(shape_.size()==2 && row1 < shape_[0] && row2 < shape_[1]);
     if (row1==row2) 

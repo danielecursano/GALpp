@@ -30,6 +30,7 @@ class Tensor {
         Tensor<T> transpose();
         void load(const std::vector<T>& extern_data);
         Tensor<T> flatten();
+        Tensor<T> inv();
         void reduce();
         T det();
         T trace();
