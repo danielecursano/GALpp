@@ -84,7 +84,7 @@ void test_ops() {
     B.rand();
     A.print();
     B.print();
-    matmul(A, B, &C);
+    linalg::matmul(A, B, &C);
     C.print();
 }
 
@@ -234,19 +234,12 @@ void test_solve() {
     A.load({1, 2, -2, 2, 1, -1, 2, -1, 2});
     Tensor<float> B({3, 1});
     B.load({-1, 1, 6});
-    cout << A.det() << endl;
-    A.print();
-    A = A.inv();
-    A.print();
-    A.dot(B).print();
-
+    linalg::solve(A, B).print();
     cout << "random test" << endl;
     A.rand();
     B.rand();
     A.print(); B.print();
-    A = A.inv();
-    A.dot(B).print();
-
+    linalg::solve(A, B).print();
 }
 
 int main() {
