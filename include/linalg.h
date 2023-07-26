@@ -23,6 +23,13 @@ namespace linalg {
         return output;
     }
 
+    template <class T>
+    float distance(Tensor<T> a, Tensor<T> b) {
+        assert(a.shape()==b.shape());
+        Tensor<T> c = a-b;
+        return c.norm();
+    }
+
 }
 
 #endif

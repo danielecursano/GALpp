@@ -253,10 +253,45 @@ void test_quadratic() {
 	
 }
 
+void test_norm() {
+    Tensor<int> A = Tensor<int>::random({N});
+    A.print();
+    cout << "Norm: " << A.norm() << endl;
+    Tensor<int> B = Tensor<int>::random({3, 3});
+    B.print();
+    cout << B.norm() << endl;
+}
+
+void test_sum() {
+    Tensor<int> A = Tensor<int>::random({N, 1});
+    Tensor<int> B = Tensor<int>::random({N, 1});
+    A.print(); B.print();
+    Tensor<int> C = A+B;
+    C.print();
+    C = A-B;
+    C.print();
+
+    A = Tensor<int>::random({N, N});
+    B = Tensor<int>::random({N, N});
+    A.print(); B.print();
+    C = A+B;
+    C.print();
+    C = A-B;
+    C.print();
+}
+
+void test_distance() {
+    Tensor<int> A({3});
+    Tensor<int> B({3});
+    A.load({2, -1, 3});
+    B.load({3, 1, 4});
+    cout << linalg::distance(A, B) << endl;
+}
+
 int main() {
     srand(time(0));
     cin >> N;
-    test_quadratic();
+    test_distance();
     while (1) {
     } 
 }

@@ -74,6 +74,22 @@ void Tensor<T>::operator*(const T scalar) {
 }
 
 template<class T>
+Tensor<T> Tensor<T>::operator+(const Tensor<T> &other) {
+    Tensor<T>output(shape_);
+    for (int i=0; i<data.size(); i++)
+        output[i] = data[i] + other.data[i];
+    return output;
+}
+
+template<class T>
+Tensor<T> Tensor<T>::operator-(const Tensor<T> &other) {
+    Tensor<T>output(shape_);
+    for (int i=0; i<data.size(); i++)
+        output[i] = data[i] - other.data[i];
+    return output;
+}
+
+template<class T>
 Tensor<T> Tensor<T>::dot(const Tensor<T> &other) {
     if ((*this).dims() == 1 && other.shape_.size()==1 && data.size()==other.data.size()) {
         Tensor<T>output({1});
@@ -249,6 +265,14 @@ T Tensor<T>::trace() {
     return trace;
 }
 
+template<class T>
+float Tensor<T>::norm() {
+    float output = 0;
+    for (int i=0; i<data.size(); i++)
+        output += pow(data[i], 2);
+    return sqrt(output);
+}
+
 template<>
 void Tensor<float>::rand() {
     for (int i=0; i<data.size(); i++) 
@@ -323,9 +347,9 @@ void Tensor<T>::printRecursive(const std::vector<T>& data, const std::vector<int
 
             if (i < shape_[depth] - 1) {
                 std::cout << ",";
+                std::cout << std::endl;
             }
 
-            std::cout << std::endl;
         }
 
         for (int i = 0; i < indent; i++) {

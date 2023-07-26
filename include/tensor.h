@@ -25,6 +25,8 @@ class Tensor {
         const T& operator()(const std::vector<int>& index) const;
         T& operator[](int index);
         void operator*(T scalar);
+        Tensor<T> operator+(const Tensor<T> &other);
+        Tensor<T> operator-(const Tensor<T> &other);
         Tensor<T> dot(const Tensor<T> &other);
         Tensor<T> outer(Tensor<T> other);
         void reshape(std::vector<int> new_shape);
@@ -35,6 +37,7 @@ class Tensor {
         void reduce();
         T det();
         T trace();
+        float norm();
         void rand();
         void empty();
         int size();
