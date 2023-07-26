@@ -1,5 +1,5 @@
 #include "tensor.h"
-#include "ops.h"
+#include "linalg.h"
 
 namespace linalg {
 

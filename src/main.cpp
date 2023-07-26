@@ -1,9 +1,9 @@
 #include "tensor.h"
-#include "ops.h"
+#include "linalg.h"
 #include "timer.h"
 #include <iostream>
 using namespace std;
-#define N 2048
+#define N 4
 #define R 1
 
 void test_tensor() {
@@ -37,15 +37,14 @@ void test_inner() {
 }
 
 void test_matmul() {
-    Tensor<int> a({N, N});
-    a.rand();
-    //a.print();
-    Tensor<int> b({N, N});
-    b.rand();
-    //b.print();
-    Tensor<int> c({N, N});
-    c = a.dot(b);
-    //c.print();
+    Tensor<float> A = Tensor<float>::random({N, N});
+    Tensor<float> B = Tensor<float>::random({N, N});
+    Tensor<float> C = A.dot(B);
+    //A.print(); B.print();
+    C.print();
+    C.empty();
+    linalg::matmul(A, B, &C);
+    C.print();
 }
 
 void test_transpose() {
@@ -244,5 +243,5 @@ void test_solve() {
 
 int main() {
     srand(time(0));
-    test_solve();
+    test_matmul();
 }

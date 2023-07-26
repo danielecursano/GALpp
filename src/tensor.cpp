@@ -264,6 +264,12 @@ void Tensor<int>::rand() {
 }
 
 template<class T>
+void Tensor<T>::empty() {
+    for (int i=0; i<data.size(); i++)
+        data[i] = 0;
+}
+
+template<class T>
 int Tensor<T>::size() {
     return data.size();
 }

@@ -35,6 +35,7 @@ class Tensor {
         T det();
         T trace();
         void rand();
+        void empty();
         int size();
         int dims();
         std::vector<int> shape();
