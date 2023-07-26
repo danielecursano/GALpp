@@ -226,8 +226,37 @@ void test_cross() {
     A.print(); B.print(); C.print();
 }
 
+void test_OLS() {
+	Tensor<float> A({3, 2});
+	Tensor<float> B({3, 1});
+	A.load({1, 2, 1, 1, 2, 1});
+	B.load({1, 1, 1});
+	(A.transpose().dot(A).inv()).dot(A.transpose()).dot(B).print();
+}
+
+void test_quadratic() {
+	/* Given data representing points in R2 
+	 * X : -1, 0, 1, 2
+	 * Y :  0, 0, 2, 4
+	 * Find the quadratic polynomial that minimizes quadratic error
+	 * p = a + bx + cx^2
+	 */
+	Tensor<float> A({4, 3});
+	A.load({1, -1, 1, 1, 0, 0, 1, 1, 1, 1, 2, 4});
+	Tensor<float> Y({4, 1});
+	Y.load({0,0,2,4});
+	(A.transpose().dot(A).inv()).dot(A.transpose()).dot(Y).print(); // {a, b, c}
+	
+	A.load({1, -1.5077, 2.2731, 1, 1.1625, 1.3514, 1, -0.9541, 0.9103, 1, 0, 0});
+	Y.load({-1.8484, 0.5296, 0.9886, 3});
+	(A.transpose().dot(A).inv()).dot(A.transpose()).dot(Y).print();
+	
+}
+
 int main() {
     srand(time(0));
     cin >> N;
-    test_cross();
+    test_quadratic();
+    while (1) {
+    } 
 }
