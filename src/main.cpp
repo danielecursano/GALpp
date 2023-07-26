@@ -3,8 +3,9 @@
 #include "timer.h"
 #include <iostream>
 using namespace std;
-#define N 4
 #define R 1
+
+int N = 4;
 
 void test_tensor() {
     Tensor<float> T({5, 1, 1});
@@ -37,9 +38,9 @@ void test_inner() {
 }
 
 void test_matmul() {
-    Tensor<float> A = Tensor<float>::random({N, N});
-    Tensor<float> B = Tensor<float>::random({N, N});
-    Tensor<float> C = A.dot(B);
+    Tensor<int> A = Tensor<int>::random({N, N});
+    Tensor<int> B = Tensor<int>::random({N, N});
+    Tensor<int> C = A.dot(B);
     //A.print(); B.print();
     C.print();
     C.empty();
@@ -160,29 +161,6 @@ void test_constructors() {
     C.print();
 }
 
-void test_swaps() {
-    double start, end;
-    Tensor<float> A = Tensor<float>::random({N, N});
-    //A.print();
-    start = get_time();
-    //A.swapRows(0, R);
-    end = get_time();
-    //A.print();
-    //A.swapRows(0, R);
-    cout << "EXEC TIME: " << end-start << endl;
-
-    Tensor<float> E = Tensor<float>::eye(N);
-    start = get_time();
-    E({0, 0}) = 0;
-    E({0, R}) = 1;
-    E({R, R}) = 0;
-    E({R, 0}) = 1;
-    //E.print();
-    Tensor<float> C = E.dot(A);
-    end = get_time();
-    cout << "EXEC TIME: " << end-start << endl;
-}
-
 void test_swappp() {
     double start, end;
 	Tensor<int> A = Tensor<int>::random({N, 1});
@@ -195,14 +173,14 @@ void test_swappp() {
     B({R, 0}) = 1;
     A = B.dot(A);
     end = get_time();
-    cout << "EXEC TIME: " << end-start << endl;
+    cout << "EXEC TIME MATMUL: " << end-start << endl;
     //A.print();
     start = get_time();
     int tmp = A({0, 0});
     A({0, 0}) = A({R, 0});
     A({R, 0}) = tmp;
     end = get_time();
-    cout << "EXEC TIME: " << end-start << endl;
+    cout << "EXEC TIME SWAP: " << end-start << endl;
     //A.print();
 }
 
@@ -241,7 +219,15 @@ void test_solve() {
     linalg::solve(A, B).print();
 }
 
+void test_cross() {
+    Tensor<int> A = Tensor<int>::random({N});
+    Tensor<int> B = Tensor<int>::random({N});
+    Tensor<int> C = linalg::cross(A, B);
+    A.print(); B.print(); C.print();
+}
+
 int main() {
     srand(time(0));
-    test_matmul();
+    cin >> N;
+    test_cross();
 }
