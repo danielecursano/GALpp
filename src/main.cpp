@@ -288,10 +288,27 @@ void test_distance() {
     cout << linalg::distance(A, B) << endl;
 }
 
+void test_fourier() {
+    Tensor<float> a({3});
+    a.load({1, 0, -1});
+    Tensor<float> b({3});
+    b.load({1, -1, 0});
+    cout << linalg::FourierCoeff(a, b) << endl;
+
+    Tensor<float> basis({3, 2});
+    basis.load({1, 1, -1, 0, 0, -1});
+    Tensor<float> ortonormal_basis = linalg::GSO(basis);
+    ortonormal_basis.print();
+    Tensor<float> v({3, 1}); v.load({1, 2, 3});
+    ortonormal_basis.dot(ortonormal_basis.transpose()).dot(v).print();
+    linalg::project(ortonormal_basis, v).print();
+    cout << "P^2 = P" << endl;
+    ortonormal_basis.dot(ortonormal_basis.transpose()).dot(ortonormal_basis.dot(ortonormal_basis.transpose())).print();
+    ortonormal_basis.dot(ortonormal_basis.transpose()).print();
+}
+
 int main() {
     srand(time(0));
     cin >> N;
-    test_distance();
-    while (1) {
-    } 
+    test_fourier(); 
 }

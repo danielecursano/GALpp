@@ -4,6 +4,9 @@
 namespace linalg {
     
     Tensor<float> solve(Tensor<float> A, Tensor<float> B);
+    float FourierCoeff(Tensor<float> v, Tensor<float> b);
+    Tensor<float> GSO(Tensor<float> v);
+    Tensor<float> project(Tensor<float> orth_basis, Tensor<float> v);
 
     template <class T>
     void matmul(Tensor<T> A, Tensor<T>B, Tensor<T> *C) {
